@@ -65,9 +65,13 @@ def handle_message(chat_id: int, text: str):
 
         workout = get_today_gym_schedule()
 
-        if workout is None:
+        if (
+            workout is None
+            or "exercises" not in workout
+            or not workout["exercises"]
+        ):
             return {
-                "text": "😴 Today is your rest day."
+                "text": "😴 *Today is your Rest Day!*\n\nEnjoy your recovery 💪"
             }
 
         completed = WORKOUT_STATE.get(chat_id, set())
@@ -133,7 +137,9 @@ def handle_callback(callback: dict):
     # ---------------------------------------------------------
     # Workout completed?
     # ---------------------------------------------------------
-    all_done = len(completed) == len(workout["exercises"])
+    exercises = workout.get("exercises", [])
+
+    all_done = len(completed) == len(exercises)
 
     if all_done:
 

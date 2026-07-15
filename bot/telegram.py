@@ -34,6 +34,9 @@ def send_message(
         timeout=15,
     )
 
+    print(response.status_code)
+    print(response.text)
+
     response.raise_for_status()
 
     return response.json()
@@ -66,6 +69,9 @@ def edit_message(
         timeout=15,
     )
 
+    print(response.status_code)
+    print(response.text)
+
     response.raise_for_status()
 
     return response.json()
@@ -86,6 +92,9 @@ def answer_callback(callback_query_id: str, text: str = ""):
         json=payload,
         timeout=15,
     )
+
+    print(response.status_code)
+    print(response.text)
 
     response.raise_for_status()
 
@@ -108,6 +117,9 @@ def set_webhook(webhook_url: str):
         timeout=15,
     )
 
+    print(response.status_code)
+    print(response.text)
+
     response.raise_for_status()
 
     return response.json()
@@ -123,6 +135,9 @@ def delete_webhook():
         f"{BASE_URL}/deleteWebhook",
         timeout=15,
     )
+
+    print(response.status_code)
+    print(response.text)
 
     response.raise_for_status()
 

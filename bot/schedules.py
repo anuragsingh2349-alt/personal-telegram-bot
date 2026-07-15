@@ -100,26 +100,25 @@ def format_college_schedule(schedule) -> str:
 
 
 def format_gym_schedule(workout, completed=None) -> str:
-    """
-    Format today's workout while showing completed exercises.
-    """
 
     if completed is None:
         completed = set()
 
     if workout is None:
-        return (
-            "😴 *Today's Gym Schedule*\n\n"
-            "Rest Day!"
-        )
+        return "😴 *Today is your Rest Day!*"
+
+    exercises = workout.get("exercises", [])
+
+    if not exercises:
+        return "😴 *Today is your Rest Day!*"
 
     message = f"💪 *{workout['name']}*\n\n"
 
-    for index, exercise in enumerate(workout["exercises"]):
+    for index, exercise in enumerate(exercises):
 
         if index in completed:
             message += f"✅ {exercise}\n"
         else:
             message += f"⬜ {exercise}\n"
 
-    return message.strip()
+    return message

@@ -3,6 +3,8 @@ import json
 
 from flask import Flask, request, jsonify
 
+import traceback
+
 from bot.telegram import send_message
 from bot.handlers import handle_message, handle_callback
 
@@ -24,20 +26,16 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    """
-    Telegram sends every update here.
-    """
 
-    update = request.get_json(silent=True)
-
-    if not update:
-        return jsonify({"ok": False}), 400
+    print("=" * 60)
+    print("WEBHOOK RECEIVED")
+    print(request.json)
+    print("=" * 60)
 
     try:
 
-        # -----------------------------
-        # Normal text message
-        # -----------------------------
+        update = request.get_json()
+
         if "message" in update:
 
             message = update["message"]
@@ -46,28 +44,30 @@ def webhook():
 
             text = message.get("text", "")
 
+            print("Message:", text)
+
             response = handle_message(chat_id, text)
 
+            print("Response:", response)
+
             if response:
+
                 send_message(
                     chat_id=chat_id,
                     **response
                 )
 
-        # -----------------------------
-        # Inline keyboard callback
-        # -----------------------------
         elif "callback_query" in update:
 
-            callback = update["callback_query"]
+            handle_callback(update["callback_query"])
 
-            handle_callback(callback)
+        return jsonify({"ok": True})
 
-    except Exception as e:
+    except Exception:
 
-        print(f"Webhook Error: {e}")
+        traceback.print_exc()
 
-    return jsonify({"ok": True})
+        return jsonify({"ok": False}), 500
 
 
 # Required by Vercel
