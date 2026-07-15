@@ -1,0 +1,120 @@
+{
+  "monday": [
+    {
+      "time": "01:30-03:30",
+      "subject": "Responsible AI Practical",
+      "teacher": "Prof. Ashwini Kukade",
+      "room": "C-03"
+    },
+    {
+      "time": "03:30-04:30",
+      "subject": "Responsible AI",
+      "teacher": "Prof. Ashwini Kukade",
+      "room": "F-02"
+    },
+    {
+      "time": "04:30-05:30",
+      "subject": "Digital Image Processing & Its Applications",
+      "teacher": "Dr. Swati Patil",
+      "room": "F-02"
+    }
+  ],
+  "tuesday": [
+    {
+      "time": "11:30-12:30",
+      "subject": "Natural Language Processing",
+      "teacher": "Dr. Vijaya Chaudhary",
+      "room": "W-36"
+    },
+    {
+      "time": "01:30-02:30",
+      "subject": "Recommendation System",
+      "teacher": "Prof. Deepa Das",
+      "room": "W-36"
+    },
+    {
+      "time": "02:30-03:30",
+      "subject": "Responsible AI",
+      "teacher": "Prof. Ashwini Kukade",
+      "room": "W-36"
+    }
+  ],
+  "wednesday": [
+    {
+      "time": "09:30-10:30",
+      "subject": "Large Language Models",
+      "teacher": "Prof. Abhay Yeole",
+      "room": "F-02"
+    },
+    {
+      "time": "10:30-11:30",
+      "subject": "Large Language Models",
+      "teacher": "Prof. Abhay Yeole",
+      "room": "F-02"
+    },
+    {
+      "time": "11:30-12:30",
+      "subject": "Recommendation System",
+      "teacher": "Prof. Deepa Das",
+      "room": "F-02"
+    },
+    {
+      "time": "01:30-02:30",
+      "subject": "Digital Image Processing & Its Applications",
+      "teacher": "Dr. Swati Patil",
+      "room": "W-36"
+    },
+    {
+      "time": "02:30-03:30",
+      "subject": "Natural Language Processing",
+      "teacher": "Dr. Vijaya Chaudhary",
+      "room": "W-36"
+    }
+  ],
+  "thursday": [
+    {
+      "time": "11:30-12:30",
+      "subject": "Recommendation System",
+      "teacher": "Prof. Deepa Das",
+      "room": "W-36"
+    },
+    {
+      "time": "01:30-02:30",
+      "subject": "Digital Image Processing & Its Applications",
+      "teacher": "Dr. Swati Patil",
+      "room": "W-36"
+    },
+    {
+      "time": "02:30-03:30",
+      "subject": "Natural Language Processing",
+      "teacher": "Dr. Vijaya Chaudhary",
+      "room": "W-36"
+    }
+  ],
+  "friday": [
+    {
+      "time": "09:30-10:30",
+      "subject": "Large Language Models",
+      "teacher": "Prof. Abhay Yeole",
+      "room": "F-02"
+    },
+    {
+      "time": "10:30-11:30",
+      "subject": "Large Language Models",
+      "teacher": "Prof. Abhay Yeole",
+      "room": "F-02"
+    },
+    {
+      "time": "11:30-12:30",
+      "subject": "Digital Image Processing & Its Applications",
+      "teacher": "Dr. Swati Patil",
+      "room": "F-02"
+    },
+    {
+      "time": "01:30-03:30",
+      "subject": "Natural Language Processing Practical",
+      "teacher": "Dr. Vijaya Chaudhary",
+      "room": "W-21"
+    }
+  ]
+}
