@@ -1,105 +1,74 @@
 import os
 import json
-import datetime
-import requests
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-API = f"https://api.telegram.org/bot{BOT_TOKEN}"
+from flask import Flask, request, jsonify
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+from bot.telegram import send_message
+from bot.handlers import handle_message, handle_callback
 
-with open(os.path.join(BASE_DIR, "data", "college.json")) as f:
-    COLLEGE = json.load(f)
-
-with open(os.path.join(BASE_DIR, "data", "gym.json")) as f:
-    GYM = json.load(f)
+app = Flask(__name__)
 
 
-def send(chat_id, text):
-    requests.post(
-        f"{API}/sendMessage",
-        json={
-            "chat_id": chat_id,
-            "text": text
+@app.route("/", methods=["GET"])
+def home():
+    """
+    Health check endpoint.
+    """
+    return jsonify(
+        {
+            "status": "running",
+            "service": "Personal Telegram Bot"
         }
     )
 
 
-def college_today():
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    """
+    Telegram sends every update here.
+    """
 
-    today = datetime.datetime.now().strftime("%A").lower()
+    update = request.get_json(silent=True)
 
-    schedule = COLLEGE.get(today, [])
+    if not update:
+        return jsonify({"ok": False}), 400
 
-    if not schedule:
-        return "🎉 No classes today."
+    try:
 
-    message = "📚 Today's College Schedule\n\n"
+        # -----------------------------
+        # Normal text message
+        # -----------------------------
+        if "message" in update:
 
-    for subject in schedule:
+            message = update["message"]
 
-        message += (
-            f"🕒 {subject['time']}\n"
-            f"📖 {subject['subject']}\n"
-            f"👨‍🏫 {subject['teacher']}\n"
-            f"🏫 {subject['room']}\n\n"
-        )
+            chat_id = message["chat"]["id"]
 
-    return message
+            text = message.get("text", "")
+
+            response = handle_message(chat_id, text)
+
+            if response:
+                send_message(
+                    chat_id=chat_id,
+                    **response
+                )
+
+        # -----------------------------
+        # Inline keyboard callback
+        # -----------------------------
+        elif "callback_query" in update:
+
+            callback = update["callback_query"]
+
+            handle_callback(callback)
+
+    except Exception as e:
+
+        print(f"Webhook Error: {e}")
+
+    return jsonify({"ok": True})
 
 
-def gym_today():
-
-    today = datetime.datetime.now().strftime("%A").lower()
-
-    workout = GYM.get(today)
-
-    if not workout:
-        return "💤 Rest Day"
-
-    return f"💪 Today's Workout\n\n{workout}"
-
-
-def today():
-
-    return college_today() + "\n----------------------\n\n" + gym_today()
-
-
-def handler(request):
-
-    if request.method != "POST":
-        return {
-            "statusCode": 200,
-            "body": "Telegram Bot Running"
-        }
-
-    data = request.get_json()
-
-    message = data["message"]
-
-    chat_id = message["chat"]["id"]
-
-    text = message["text"].lower()
-
-    if "college" in text:
-
-        send(chat_id, college_today())
-
-    elif "gym" in text:
-
-        send(chat_id, gym_today())
-
-    elif "today" in text:
-
-        send(chat_id, today())
-
-    else:
-
-        send(
-            chat_id,
-            "Commands:\n\ncollege\ngym\ntoday"
-        )
-
-    return {
-        "statusCode": 200
-    }
+# Required by Vercel
+app = app
