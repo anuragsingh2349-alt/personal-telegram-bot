@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import json
 
 # Root directory of the project
@@ -9,6 +10,9 @@ DATA_DIR = ROOT_DIR / "data"
 
 COLLEGE_FILE = DATA_DIR / "college.json"
 GYM_FILE = DATA_DIR / "gym.json"
+
+# Indian Standard Time
+IST = ZoneInfo("Asia/Kolkata")
 
 
 def load_college_schedule() -> dict:
@@ -29,12 +33,14 @@ def load_gym_schedule() -> dict:
 
 def get_today_name() -> str:
     """
-    Returns:
+    Returns the current weekday in Indian Standard Time.
+
+    Example:
         monday
         tuesday
         ...
     """
-    return datetime.now().strftime("%A").lower()
+    return datetime.now(IST).strftime("%A").lower()
 
 
 def get_today_college_schedule():
@@ -100,25 +106,33 @@ def format_college_schedule(schedule) -> str:
 
 
 def format_gym_schedule(workout, completed=None) -> str:
+    """
+    Convert today's workout into a Telegram-friendly message.
+    """
 
     if completed is None:
         completed = set()
 
     if workout is None:
-        return "😴 *Today is your Rest Day!*"
+        return (
+            "😴 *Today is your Rest Day!*\n\n"
+            "Enjoy your recovery 💪"
+        )
 
     exercises = workout.get("exercises", [])
 
     if not exercises:
-        return "😴 *Today is your Rest Day!*"
+        return (
+            "😴 *Today is your Rest Day!*\n\n"
+            "Enjoy your recovery 💪"
+        )
 
     message = f"💪 *{workout['name']}*\n\n"
 
     for index, exercise in enumerate(exercises):
-
         if index in completed:
             message += f"✅ {exercise}\n"
         else:
             message += f"⬜ {exercise}\n"
 
-    return message
+    return message.strip()
