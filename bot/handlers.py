@@ -1,6 +1,9 @@
 from bot.schedules import (
+    DAYS,
     get_today_college_schedule,
     get_today_gym_schedule,
+    get_college_schedule,
+    get_gym_schedule,
     format_college_schedule,
     format_gym_schedule,
 )
@@ -30,38 +33,69 @@ WORKOUT_STATE = {}
 
 
 def handle_message(chat_id: int, text: str):
-    """
-    Handle incoming Telegram messages.
-    Returns a dictionary for send_message().
-    """
 
     text = text.lower().strip()
 
-    # ---------------------------------------------------------
-    # College Schedule
-    # ---------------------------------------------------------
-    if (
-        "/college" in text
-        or "college" in text
-        or "class" in text
-        or "schedule" in text
-    ) and "gym" not in text:
+    requested_day = None
+
+    for day in DAYS:
+        if day in text:
+            requested_day = day
+            break
+
+    # -------------------------
+    # College
+    # -------------------------
+    if "college" in text and "gym" not in text:
+
+        if requested_day:
+            schedule = get_college_schedule(requested_day)
+
+            return {
+                "text": format_college_schedule(
+                    schedule,
+                    f"📚 *{requested_day.capitalize()} College Schedule*",
+                )
+            }
 
         schedule = get_today_college_schedule()
 
         return {
-            "text": format_college_schedule(schedule)
+            "text": format_college_schedule(
+                schedule,
+                "📚 *Today's College Schedule*",
+            )
         }
 
-    # ---------------------------------------------------------
-    # Gym Schedule
-    # ---------------------------------------------------------
-    if (
-        "/gym" in text
-        or "gym" in text
-        or "workout" in text
-        or "exercise" in text
-    ):
+    # -------------------------
+    # Gym
+    # -------------------------
+    if "gym" in text or "workout" in text or "exercise" in text:
+
+        if requested_day:
+
+            workout = get_gym_schedule(requested_day)
+
+            if (
+                workout is None
+                or "exercises" not in workout
+                or not workout["exercises"]
+            ):
+                return {
+                    "text": (
+                        f"💪 *{requested_day.capitalize()} Workout*\n\n"
+                        "😴 Rest Day\n\n"
+                        "Enjoy your recovery 💪"
+                    )
+                }
+
+            return {
+                "text": format_gym_schedule(
+                    workout,
+                    set(),
+                    f"💪 *{requested_day.capitalize()} - {workout['name']}*",
+                )
+            }
 
         workout = get_today_gym_schedule()
 
@@ -71,7 +105,10 @@ def handle_message(chat_id: int, text: str):
             or not workout["exercises"]
         ):
             return {
-                "text": "😴 *Today is your Rest Day!*\n\nEnjoy your recovery 💪"
+                "text": (
+                    "😴 *Today is your Rest Day!*\n\n"
+                    "Enjoy your recovery 💪"
+                )
             }
 
         completed = WORKOUT_STATE.get(chat_id, set())
@@ -84,15 +121,16 @@ def handle_message(chat_id: int, text: str):
             ),
         }
 
-    # ---------------------------------------------------------
-    # Help Message
-    # ---------------------------------------------------------
     return {
         "text": (
-            "🤖 Personal Schedule Bot\n\n"
+            "🤖 *Personal Schedule Bot*\n\n"
             "Available commands:\n\n"
             "📚 /college\n"
-            "💪 /gym"
+            "💪 /gym\n\n"
+            "📅 Weekly schedule:\n"
+            "/mondaycollege\n"
+            "/mondaygym\n"
+            "... works for every weekday."
         )
     }
 

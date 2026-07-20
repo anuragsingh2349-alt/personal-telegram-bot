@@ -3,7 +3,6 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import json
 
-# Root directory of the project
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
 DATA_DIR = ROOT_DIR / "data"
@@ -11,88 +10,57 @@ DATA_DIR = ROOT_DIR / "data"
 COLLEGE_FILE = DATA_DIR / "college.json"
 GYM_FILE = DATA_DIR / "gym.json"
 
-# Indian Standard Time
 IST = ZoneInfo("Asia/Kolkata")
 
-
-def load_college_schedule() -> dict:
-    """
-    Load the complete college timetable.
-    """
-    with open(COLLEGE_FILE, "r", encoding="utf-8") as file:
-        return json.load(file)
-
-
-def load_gym_schedule() -> dict:
-    """
-    Load the complete gym schedule.
-    """
-    with open(GYM_FILE, "r", encoding="utf-8") as file:
-        return json.load(file)
+DAYS = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+]
 
 
-def get_today_name() -> str:
-    """
-    Returns the current weekday in Indian Standard Time.
+def load_college_schedule():
+    with open(COLLEGE_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-    Example:
-        monday
-        tuesday
-        ...
-    """
+
+def load_gym_schedule():
+    with open(GYM_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def get_today_name():
     return datetime.now(IST).strftime("%A").lower()
 
 
+def get_college_schedule(day):
+    return load_college_schedule().get(day.lower(), [])
+
+
+def get_gym_schedule(day):
+    return load_gym_schedule().get(day.lower())
+
+
 def get_today_college_schedule():
-    """
-    Returns today's college schedule.
-
-    Example:
-
-    [
-        {
-            "time": "...",
-            "subject": "...",
-            "teacher": "...",
-            "room": "..."
-        }
-    ]
-    """
-
-    timetable = load_college_schedule()
-
-    return timetable.get(get_today_name(), [])
+    return get_college_schedule(get_today_name())
 
 
 def get_today_gym_schedule():
-    """
-    Returns today's workout.
-
-    Example:
-
-    {
-        "name": "Push A",
-        "exercises": [...]
-    }
-    """
-
-    workouts = load_gym_schedule()
-
-    return workouts.get(get_today_name())
+    return get_gym_schedule(get_today_name())
 
 
-def format_college_schedule(schedule) -> str:
-    """
-    Convert today's classes into a Telegram-friendly message.
-    """
-
+def format_college_schedule(schedule, title="📚 *College Schedule*"):
     if not schedule:
         return (
-            "🎉 *Today's College Schedule*\n\n"
-            "No classes scheduled today."
+            f"{title}\n\n"
+            "🎉 No classes scheduled."
         )
 
-    message = "📚 *Today's College Schedule*\n\n"
+    message = f"{title}\n\n"
 
     for lecture in schedule:
         message += (
@@ -105,17 +73,15 @@ def format_college_schedule(schedule) -> str:
     return message.strip()
 
 
-def format_gym_schedule(workout, completed=None) -> str:
-    """
-    Convert today's workout into a Telegram-friendly message.
-    """
+def format_gym_schedule(workout, completed=None, title=None):
 
     if completed is None:
         completed = set()
 
     if workout is None:
         return (
-            "😴 *Today is your Rest Day!*\n\n"
+            f"{title or '💪 Workout'}\n\n"
+            "😴 Rest Day\n\n"
             "Enjoy your recovery 💪"
         )
 
@@ -123,11 +89,14 @@ def format_gym_schedule(workout, completed=None) -> str:
 
     if not exercises:
         return (
-            "😴 *Today is your Rest Day!*\n\n"
+            f"{title or '💪 Workout'}\n\n"
+            "😴 Rest Day\n\n"
             "Enjoy your recovery 💪"
         )
 
-    message = f"💪 *{workout['name']}*\n\n"
+    header = title if title else f"💪 *{workout['name']}*"
+
+    message = header + "\n\n"
 
     for index, exercise in enumerate(exercises):
         if index in completed:
